@@ -1,0 +1,1 @@
+principle of inclusion and exclution(A U B U C = n(A) + n(B) + n(C)-n(AUB)-n(AUC)-n(BUC)+n(AUBUC));
