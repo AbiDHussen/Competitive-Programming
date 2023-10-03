@@ -1,95 +1,75 @@
-#include <bits/stdc++.h>
+/* DSU Applications:
+1) Cycle detection
+2) Connected Components in graph
+3) MST(Minimum Spanning Tree) */
+#include <bits/stdc++.h> //=> O(1)
 using namespace std;
 
-// Speed
-#define Code ios_base::sync_with_stdio(false);
-#define By cin.tie(NULL);
-#define Abid cout.tie(NULL);
-
-using vi = vector<int>;
-using vs = vector<string>;
-using ll = long long;
-
-#define int long long
-#define mod 100000007
-#define endl '\n'
-#define coutall(v)         \
-    for (auto &it : v)     \
-        cout << it << ' '; \
-    cout << endl;
 const int N = 1e5 + 10;
 int par[N];
-int s[N];
-void make(int v)
+int Size[N];
+
+int Find(int v) // returns the representative of the set that contains the element v
 {
-    par[v] = v;
-    s[v] = 1;
-}
-int find(int v)
-{
-    if (v == par[v])
-    {
-        return v;
-    }
-    // path compression
-    par[v] = find(par[v]);
-    return par[v];
-}
-void Union(int a, int b)
-{
-    a = find(a);
-    b = find(b);
-    if (a != b)
-    {
-        // union by size
-        if (s[a] < s[b])
-        {
-            swap(a, b);
-        }
-        par[b] = a;
-        s[a] += s[b];
-    }
-}
-void solve()
-{
-    int n;
-    cin >> n;
-    int k;
-    cin >> k;
-    for (int i = 1; i <= n; i++)
-    {
-        make(i);
-    }
-    while (k--)
-    {
-        int u, v;
-        cin >> u >> v;
-        Union(u, v);
-    }
-    int cc = 0;
-    for (int i = 1; i <= n; i++)
-    {
-        if (find(i) == i)
-        {
-            cc++;
-        }
-    }
-    cout << cc << endl;
-    for (int i = 1; i <= n; i++)
-    {
-        cout << par[i] << " ";
-    }
-    cout << endl;
+    if (par[v] == v) return v;
+    return par[v] = Find(par[v]); // Path Compression
 }
 
-int32_t main()
+void Union(int u, int v) // merges the two specified sets(u & v)
 {
-    // Code By Abid
-    int t = 1;
-    // cin >> t;
-    for (int tc = 1; tc <= t; ++tc)
+    int repU = Find(u);
+    int repV = Find(v);
+    if (repU != repV)
     {
-        // cout << "Case " << tc << ":";
-        solve();
+        if (Size[repU] < Size[repV]) swap(repU, repV); // Union by size
+        par[repV] = repU;
+        Size[repU] += Size[repV];
     }
+}
+
+int get_size(int i)
+{
+    return Size[Find(i)];
+}
+
+void numberOfConnectedComponents(int n)
+{
+    int ct = 0;
+    for (int i = 1; i <= n; ++i)
+    {
+        if (Find(i) == i) ++ct;
+    }
+    cout << ct << endl;
+}
+
+void build(int n)
+{
+    for (int i = 0; i <= n; i++) 
+    {
+        par[i] = i;
+        Size[i] = 1;
+    }
+}
+
+int main()
+{
+    int u, v, tc, n, k;
+    cin >> n >> k;
+    
+    build(n); // Create a new set
+
+    bool cycle = 0;
+    for (int i = 1; i <= k; i++)
+    {
+        cin >> u >> v;
+        /* //Finding Cycle
+        if(Find(u)==Find(v)) cycle=1;   //Cycle is Found;
+        else Union(u, v); */
+        Union(u, v);
+    }
+    // if(cycle) cout<<"Found Cycle";
+    
+    numberOfConnectedComponents(n); // Count Connected Components
+
+    return 0;
 }
