@@ -6,6 +6,11 @@ using namespace std;
 // #define int long long
 #define all(x)      x.begin(),x.end()
 #define allr(x)     x.rbegin(),x.rend()
+#define CheckBit(x,k)   (x & (1LL << k))
+#define SetBit(x,k)     (x |= (1LL << k))
+#define ClearBit(x,k)   (x &= ~(1LL << k))
+#define LSB(mask)       __builtin_ctzll(mask)
+#define MSB(mask)       63-__builtin_clzll(mask) 
 #define print(x)    cout << #x << " : " << x << endl
 #define error1(x)   cerr << #x << " = " << (x) <<endl
 #define coutall(v)  for(auto &it: v) cout<<it<<' '; cout<<endl
@@ -17,19 +22,19 @@ template <typename T, typename U> T floor(T x, U y) {return (x > 0 ? x / y : (x 
 const int N = 1e5 + 10;
 void solve()
 {
-    int n,m;
+    int n, m;
     cin >> n;
-    vector<int> v(n+5);
+    vector<int> v(n + 5);
     for (int i = 0; i < n; i++)
     {
-        cin>>v[i];
+        cin >> v[i];
     }
 }
 int32_t main()
 {
     Abid_52;
     int t = 1;
-    cin >> t;
+    // cin >> t;
     for (int tc = 1; tc <= t; ++tc)
     {
         // cout << "Case " << tc << ": ";
