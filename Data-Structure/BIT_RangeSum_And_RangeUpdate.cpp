@@ -1,88 +1,72 @@
-// code from Youtube Channel LoveExtendsCode
-#include <bits/stdc++.h>
-using namespace std;
- 
-// Speed
-#define Code ios_base::sync_with_stdio(false);
-#define By cin.tie(NULL);
-#define Abid cout.tie(NULL);
- 
-using vi = vector<int>;
-using vs = vector<string>;
-using ll = long long;
- 
-#define int long long
-#define mod 100000007
+//Problem Link : https://cses.fi/problemset/task/1648/
+#include<bits/stdc++.h>
 #define endl '\n'
-#define coutall(v)         \
-    for (auto &it : v)     \
-        cout << it << ' '; \
-    cout << endl;
-const int N = 2e5 + 10;
-// int tree[N];
-int bit1[N];
-int bit2[N];
-int query(int idx, int *tree) //(Query Time Complexity=O(log(n))
-{
-    int sum = 0;
-    while (idx > 0)
-    {
-        // cout << idx << " ";
-        sum += tree[idx];
-        idx -= (idx & -idx);
+using namespace std;
+using ll = long long;
+using ld = long double;
+
+template <class T>
+struct BIT { // 1-indexed
+    int n;
+    vector<T> t;
+    BIT() {}
+    BIT(int _n) {
+        n = _n;
+        t.assign(n + 1, 0);
     }
-    // cout << endl;
-    return sum;
-}
-ll RangeSum(int l, int r)
-{
-    ll sum1 = query(r, bit1) * r - query(r, bit2);               // Sum of elements in [1, r]
-    ll sum2 = query(l - 1, bit1) * (l - 1) - query(l - 1, bit2); // Sum of elements in [1, l-1]
-    return sum1 - sum2;                                          // Sum of elements in [l,r] = Sum of elements in [0,r] - Sum of elements in [0, l-1]
-}
-void update(int idx, int val, int n, int *tree) //(Update Time Complexity=O(log(n))
-{
-    while (idx <= n)
-    {
-        tree[idx] += val;
-        idx += (idx & -idx);
+    T query(int i) {
+        T ans = 0;
+        for (; i >= 1; i -= (i & -i)) ans += t[i];
+        return ans;
     }
-}
-void RangeUpdate(int l, int r, int val, int n)
-{
-    update(l, val, n, bit1);
-    update(r + 1, -val, n, bit1);
- 
-    update(l, val * (l - 1), n, bit2);
-    update(r + 1, -val * r, n, bit2);
-}
-void solve()
-{
+    T query(int l, int r) {
+        return query(r) - query(l - 1);
+    }
+    void update(int i, T val) {
+        if (i <= 0) return;
+        for (; i <= n; i += (i & -i)) t[i] += val;
+    }
+    void update(int l, int r, T val) {
+        upd(l, val);
+        upd(r + 1, -val);
+    }
+};
+
+void solve() {
     int n, q;
     cin >> n >> q;
-    vector<int> v(n + 10);
-    for (ll i = 1; i <= n; i++) // Tree Construction Time Complexity=O(n*log(n))
-    {
-        cin >> v[i];
-        // update(i, v[i], n);
-        RangeUpdate(i, i, v[i], n);
+    vector<int> val(n + 1);
+    BIT<ll> bit1(n + 1);
+    for(int i = 1; i <= n; i++) {
+        cin >> val[i];
+        bit1.update(i, val[i]);
     }
-    while (q--)
-    {
-        int l, r;
-        cin >> l >> r;
-        cout << RangeSum(l, r) << endl;
+
+    while(q--){
+        short type;
+        cin >> type;
+        if(type == 1){
+            int id, v;
+            cin >> id >> v;
+            bit1.update(id, -val[id]);//reduce the current value to zero
+            val[id] = v;
+            bit1.update(id, val[id]);//add the new value
+        }
+        else{
+            int l, r;
+            cin >> l >> r;
+            cout << bit1.query(l, r) << endl;
+        }
     }
 }
- 
-int32_t main()
-{
-    // Code By Abid
-    int t = 1;
-    // cin >> t;
-    for (int tc = 1; tc <= t; ++tc)
-    {
-        // cout << "Case " << tc << ":";
+
+signed main() {
+    ios::sync_with_stdio(false); cin.tie(0);
+    int tc = 1;
+    // cin >> tc;
+    for (int t = 1; t <= tc; t++) {
+        // cout << "Case " << t << ": ";
         solve();
     }
+    return 0;
 }
