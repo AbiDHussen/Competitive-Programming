@@ -1,89 +1,91 @@
-#include <bits/stdc++.h>
+#include<bits/stdc++.h>
+#define endl '\n'
+using ll = long long;
 using namespace std;
 
-// Speed
-#define Code ios_base::sync_with_stdio(false);
-#define By cin.tie(NULL);
-#define Abid cout.tie(NULL);
+const int N = 3e5 + 9;
 
-using vi = vector<int>;
-using vs = vector<string>;
-using ll = long long;
+struct Segment_Tree {
+    ll t[4 * N];
 
-#define mod 100000007
-#define endl '\n'
-#define coutall(v)         \
-    for (auto &it : v)     \
-        cout << it << ' '; \
-    cout << endl;
-const int N = 1e5 + 10;
-int arr[] = {5, 1, 2, 6, 3, 5, 9};
-int tree[N];
-void init(int node, int b, int e)
-{
-    if (b == e)
-    {
-        tree[node] = arr[b];
+    auto merge(auto &l, auto &r) { // <= Change this function
+        return l + r;
+    }
+    void build(int node, int st, int en, vector<ll> &arr) { //=> O(N)
+        if (st == en) {
+            t[node] = arr[st];
+            return;
+        }
+        int mid = (st + en) >> 1;
+        build(node << 1, st, mid, arr); // divide left side
+        build(node << 1 | 1, mid + 1, en, arr); // divide right side
+        // Merging left and right portion
+        auto &Cur = t[node];
+        auto &Left = t[node << 1];
+        auto &Right = t[node << 1 | 1];
+        Cur = merge(Left, Right);
         return;
     }
-    int left = node * 2 + 1;
-    int right = node * 2 + 2;
-    int mid = (b + e) / 2;
-    init(left, b, mid);
-    init(right, mid + 1, e);
-    tree[node] = tree[left] + tree[right];
-}
-int query(int node, int b, int e, int i, int j)
-{
-    if (i > e || j < b)
-    {
-        return 0;
-    }
-    if (b >= i && e <= j)
-    {
-        return tree[node];
-    }
-    int left = node * 2 + 1;
-    int right = node * 2 + 2;
-    int mid = (b + e) / 2;
-    int leftSum = query(left, b, mid, i, j);
-    int rightSum = query(right, mid + 1, e, i, j);
-    return leftSum + rightSum;
-}
-void update(int node, int b, int e, int target, int val)
-{
-    if (target > e || target < b)
-    {
+    void update(int node, int st, int en, int idx, ll val) { //=> O(log n)
+        if (st == en) {
+            t[node] = val;
+            return;
+        }
+        int mid = (st + en) >> 1;
+        if (idx <= mid) update(node << 1, st, mid, idx, val);
+        else update(node << 1 | 1, mid + 1, en, idx, val);
+        // Merging left and right portion
+        auto &Cur = t[node];
+        auto &Left = t[node << 1];
+        auto &Right = t[node << 1 | 1];
+        Cur = merge(Left, Right);
         return;
     }
-    if (b == e && target == b)
-    {
-        tree[node] = val;
-        return;
+    ll query(int node, int st, int en, int l, int r) { //=> O(log n)
+        if (st > r || en < l) { // No overlapping and out of range
+            return 0; // <== careful 
+        }
+        if (l <= st && en <= r) { // Complete overlapped (l-r in range)
+            return t[node];
+        }
+        // Partial overlapping
+        int mid = (st + en) >> 1;
+        auto Left = query(node << 1, st, mid, l, r);
+        auto Right = query(node << 1 | 1, mid + 1, en, l, r);
+        return merge(Left, Right);
     }
-    int left = node * 2 + 1;
-    int right = node * 2 + 2;
-    int mid = (b + e) / 2;
-    update(left, b, mid, target, val);
-    update(right, mid + 1, e, target, val);
-    tree[node] = tree[left] + tree[right];
-}
-void solve()
-{
-    init(0, 0, 6);
-    // cout << tree[1] << endl;
-    cout << query(0, 0, 6, 2, 5) << endl;
-    update(0, 0, 6, 1, 5);
-    cout << tree[0] << endl;
+} st;
+
+void solve() {
+    ll n, q;
+    cin >> n >> q;
+    vector<ll> v(n + 1);
+    for (int i = 1; i <= n; i++) {
+        ll x; cin >> x;
+        v[i] = x;
+    }
+    st.build(1, 1, n, v); // Creating Segment tree;
+    while (q--) {
+        short type; cin >> type;
+        if (type == 1) {
+            int i, val; cin >> i >> val;
+            st.update(1, 1, n, i, v[i] + val);
+            v[i] += val;
+        }
+        else {
+            int l, r; cin >> l >> r;
+            cout << st.query(1, 1, n, l, r) << endl;
+        }
+    }
+    return;
 }
 
-int main()
-{
-    // Code By Abid
-    ll t = 1;
-    // cin >> t;
-    while (t--)
-    {
+signed main() {
+    ios::sync_with_stdio(false);cin.tie(0), cin.tie(0);
+    int tc = 1;
+    // cin >> tc;
+    for (int i = 1; i <= tc; ++i) {
+        // cout << "Case " << i << ":\n";
         solve();
     }
     return 0;
