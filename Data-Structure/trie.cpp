@@ -1,83 +1,98 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-// Speed
-#define Code ios_base::sync_with_stdio(false);
-#define By cin.tie(NULL);
-#define Abid cout.tie(NULL);
+struct Trie {
+    static const int rangeSize = 26; // for lower_case letter ('a' <= 'z')
 
-using vi = vector<int>;
-using vs = vector<string>;
-using ll = long long;
+    struct node {
+        node *next[rangeSize]; 
+        bool completedWord;
+        int cnt;
+        node() {
+            completedWord = false;
+            cnt = 0;
+            for (int i = 0; i < rangeSize; i++)
+                next[i] = nullptr;
+        }
+    } *root;
 
-#define int long long
-#define mod 100000007
-#define endl '\n'
-#define coutall(v)         \
-    for (auto &it : v)     \
-        cout << it << ' '; \
-    cout << endl;
-const int N = 1e5 + 10;
-struct node
-{
-    bool endmark;
-    node* next[27];
-    node()
-    {
-        endmark=false;
-        for(int i=0;i<26;i++)
-        {
-            next[i]=NULL;
+    Trie() {
+        root = new node();
+    }
+
+    void trieInsert(const string &s) {
+        node *cur = root;
+        for (char ch : s) {
+            int x = ch - 'a'; // for lowercase letter
+            if (cur->next[x] == nullptr) {
+                cur->next[x] = new node();
+            }
+            cur = cur->next[x];
+            cur->cnt += 1;
+        }
+        cur->completedWord = true;
+    }
+
+    bool trieSearch(const string &s) {
+        node *cur = root;
+        for (char ch : s) {
+            int x = ch - 'a'; // for lowercase letter
+            if (cur->next[x] == nullptr) {
+                return false;
+            }
+            cur = cur->next[x];
+        }
+        return cur->completedWord;
+    }
+
+    int prefixCount(const string &s) {
+        node *cur = root;
+        for (char ch : s) {
+            int x = ch - 'a'; // for lowercase letter
+            if (cur->next[x] == nullptr) {
+                return 0;
+            }
+            cur = cur->next[x];
+        }
+        return cur->cnt;
+    }
+
+    void reset(node* cur) {
+        for(int i = 0; i < rangeSize; i++)
+            if(cur->next[i])
+                reset(cur->next[i]);
+        delete cur;
+    }
+
+    void clear() {
+        reset(root); // Delete all nodes
+        root = new node(); // Re-initialize root node for reuse
+    }
+
+    ~Trie() { // Destructor 
+        reset(root);
+    }
+} trie;
+
+int main() {
+    ios::sync_with_stdio(false); cin.tie(0);
+    int tc = 1;
+    cin >> tc;
+    while (tc--) {
+        trie.clear(); // <===
+        int n, q;
+        cin >> n;
+        string s;
+        for (int i = 0; i < n; i++) {
+            cin >> s;
+            trie.trieInsert(s);
+        }
+        cin >> q;
+        while (q--) {
+            cin >> s;
+            if (trie.trieSearch(s)) cout << "Found\n";
+            else cout << "Not Found\n";
         }
     }
-}*root;
-void insert(string s)
-{
-    node* curr = root;
-    for(int i=0;i<s.size();i++)
-    {
-        int id=s[i]-'a';
-        if(curr->next[id]==NULL)
-        {
-            curr->next[id]=new node();
-        }
-        curr=curr->next[id];
-    }
-    curr->endmark=1;
-}
-bool search(string s)
-{
-    node* curr=root;
-    for(int i=0;i<s.size();i++)
-    {
-        int id=s[i]-'a';
-        if(curr->next[id]==NULL)
-        {
-            return false;
-        }
-        curr=curr->next[id];
-    }
-    return curr->endmark;
-}
-void solve()
-{
-    int n;
-    cin >> n;
-    // vector<int> v(n);
-    // for (ll i = 0; i < n; i++)
-    // {
-    //     cin >> v[i];
-    // }
-}
-
-int32_t main()
-{
-    // Code By Abid
-    int t = 1;
-    cin >> t;
-    for (int tc = 1; tc <= t; ++tc)
-    {
-        // cout << "Case " << tc << ":";
-        solve();
-    }
+    return 0;
 }
